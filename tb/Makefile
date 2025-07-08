@@ -11,6 +11,7 @@ all: $(BIN)
 
 $(BIN): $(SRC_FILES) $(CXX_SRCS)
 	$(VERILATOR) --cc --exe --build --trace \
+		-I$(SRC_DIR) \
 		--top-module $(TOP_MODULE) \
 		$(SRC_FILES) $(CXX_SRCS)
 
