@@ -38,6 +38,7 @@ bool run_aead_encrypt(Vascon_verilator_wrapper* top, const std::string& key, con
     auto assoc = hex_to_u32(ad);
     auto expected_out = hex_to_u32(expected);
 
+    std::cout << "Starting run_aead_encrypt..." << std::endl;
     reset(top);
     top->mode = 1; // Encrypt
 
@@ -45,9 +46,10 @@ bool run_aead_encrypt(Vascon_verilator_wrapper* top, const std::string& key, con
     for (auto w : npub) { top->bdi = w; top->bdi_type = 1; top->bdi_valid = 0xF; do { tick(top); } while (!top->bdi_ready); top->bdi_valid = 0; tick(top); }
     for (auto w : assoc) { top->bdi = w; top->bdi_type = 2; top->bdi_valid = 0xF; do { tick(top); } while (!top->bdi_ready); top->bdi_valid = 0; tick(top); }
     for (auto w : plaintext) { top->bdi = w; top->bdi_type = 3; top->bdi_valid = 0xF; do { tick(top); } while (!top->bdi_ready); top->bdi_valid = 0; tick(top); }
-
+    
     size_t idx = 0;
     while (!top->done) {
+        std::cout << "!top->done" << std::endl;
         tick(top);
         if (top->bdo_valid && idx < expected_out.size()) {
             if (top->bdo != expected_out[idx]) return false;
@@ -111,6 +113,7 @@ bool run_hash(Vascon_verilator_wrapper* top, size_t msg_len, const std::vector<u
 }
 
 int main(int argc, char** argv) {
+    std::cout << "Starting simulation..." << std::endl;
     Verilated::commandArgs(argc, argv);
     auto* top = new Vascon_verilator_wrapper;
 
