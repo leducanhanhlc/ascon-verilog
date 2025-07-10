@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
     Verilated::traceEverOn(true);  // enable trace globally
     auto* top = new Vascon_verilator_wrapper;
 
-    top->trace(tfp, 99);  // depth 99 là đủ cho các module nhỏ
+    top->trace(tfp, 999);  // depth 99 là đủ cho các module nhỏ
     tfp->open("ascon_trace.vcd");   
 
     std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> aead_kats = {
