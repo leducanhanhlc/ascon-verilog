@@ -10,8 +10,8 @@ vluint64_t main_time = 0;
 double sc_time_stamp() { return main_time; }
 
 void tick(Vascon_verilator_wrapper* top) {
-    top->clk = 0; top->eval(); main_time++;
-    top->clk = 1; top->eval(); main_time++;
+    top->clk = 0; top->eval(); main_time++; tfp->dump(main_time++);
+    top->clk = 1; top->eval(); main_time++; tfp->dump(main_time++);
 }
 
 void reset(Vascon_verilator_wrapper* top, int cycles = 5) {
@@ -114,6 +114,9 @@ bool run_hash(Vascon_verilator_wrapper* top, size_t msg_len, const std::vector<u
 
 int main(int argc, char** argv) {
     std::cout << "Starting simulation..." << std::endl;
+    VerilatedVcdC* tfp = new VerilatedVcdC;
+    top->trace(tfp, 99);  // depth 99 là đủ cho các module nhỏ
+    tfp->open("ascon_trace.vcd");   
     Verilated::commandArgs(argc, argv);
     auto* top = new Vascon_verilator_wrapper;
 
@@ -148,5 +151,7 @@ int main(int argc, char** argv) {
     }
 
     delete top;
+    tfp->close();
+    delete tfp;
     return 0;
 }
