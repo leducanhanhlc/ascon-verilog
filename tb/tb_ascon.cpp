@@ -118,6 +118,7 @@ bool run_hash(Vascon_verilator_wrapper* top, size_t msg_len, const std::vector<u
 int main(int argc, char** argv) {
     std::cout << "Starting simulation..." << std::endl;
     Verilated::commandArgs(argc, argv);
+    Verilated::traceEverOn(true);  // enable trace globally
     auto* top = new Vascon_verilator_wrapper;
 
     top->trace(tfp, 99);  // depth 99 là đủ cho các module nhỏ
