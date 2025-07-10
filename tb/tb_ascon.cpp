@@ -5,6 +5,7 @@
 #include <string>
 #include <cassert>
 #include <iomanip>
+#include "verilated_vcd_c.h"
 
 VerilatedVcdC* tfp = new VerilatedVcdC;
 
