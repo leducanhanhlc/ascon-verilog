@@ -43,7 +43,10 @@ bool run_aead_encrypt(Vascon_verilator_wrapper* top, const std::string& key, con
 
     std::cout << "Starting run_aead_encrypt..." << std::endl;
     reset(top);
-    top->mode = 1; // Encrypt
+    top->mode = 1;  // Encrypt
+    tick(top);      // BẮT BUỘC: Để FSM thoát khỏi IDLE
+    top->mode = 0;  // Clear để tránh giữ mode trong các chu kỳ sau
+
 
     for (auto w : k) { top->key = w; top->key_valid = 1; do { tick(top); } while (!top->key_ready); top->key_valid = 0; tick(top); }
     for (auto w : npub) { top->bdi = w; top->bdi_type = 1; top->bdi_valid = 0xF; do { tick(top); } while (!top->bdi_ready); top->bdi_valid = 0; tick(top); }
@@ -72,7 +75,9 @@ bool run_aead_decrypt(Vascon_verilator_wrapper* top, const std::string& key, con
     auto expected_out = hex_to_u32(expected_pt);
 
     reset(top);
-    top->mode = 2;  // mode_e::M_DEC = 2
+    top->mode = 2;  // Decrypt
+    tick(top);
+    top->mode = 0;
 
     for (auto w : k) { top->key = w; top->key_valid = 1; do { tick(top); } while (!top->key_ready); top->key_valid = 0; tick(top); }
     for (auto w : npub) { top->bdi = w; top->bdi_type = 1; top->bdi_valid = 0xF; do { tick(top); } while (!top->bdi_ready); top->bdi_valid = 0; tick(top); }
@@ -92,7 +97,9 @@ bool run_aead_decrypt(Vascon_verilator_wrapper* top, const std::string& key, con
 
 bool run_hash(Vascon_verilator_wrapper* top, size_t msg_len, const std::vector<uint32_t>& expected) {
     reset(top);
-    top->mode = 3; // Hash
+    top->mode = 3;
+    tick(top);
+    top->mode = 0;
 
     for (size_t i = 0; i < msg_len; i += 4) {
         uint32_t w = ((i+3) << 24) | ((i+2) << 16) | ((i+1) << 8) | i;
