@@ -44,17 +44,16 @@ bool run_aead_encrypt(Vascon_verilator_wrapper* top, const std::string& key, con
     std::cout << "Starting run_aead_encrypt..." << std::endl;
     reset(top);
 
-    // 1. Set mode
-    top->mode = 1;  // Encrypt
+    top->mode = 1;
     tick(top);
 
-    // 2. Chờ core thoát khỏi IDLE
-    while (top->fsm == 0 /* hoặc enum cho IDLE */) {
+    // Chờ key_ready bật
+    while (!top->key_ready) {
         tick(top);
     }
 
-    // 3. Clear mode
     top->mode = 0;
+
 
 
     for (auto w : k) { top->key = w; top->key_valid = 1; do { tick(top); } while (!top->key_ready); top->key_valid = 0; tick(top); }
@@ -85,17 +84,16 @@ bool run_aead_decrypt(Vascon_verilator_wrapper* top, const std::string& key, con
 
     reset(top);
 
-    // 1. Set mode
-    top->mode = 1;  // Encrypt
+    top->mode = 1;
     tick(top);
 
-    // 2. Chờ core thoát khỏi IDLE
-    while (top->fsm == 0 /* hoặc enum cho IDLE */) {
+    // Chờ key_ready bật
+    while (!top->key_ready) {
         tick(top);
     }
 
-    // 3. Clear mode
     top->mode = 0;
+
 
 
     for (auto w : k) { top->key = w; top->key_valid = 1; do { tick(top); } while (!top->key_ready); top->key_valid = 0; tick(top); }
@@ -117,17 +115,16 @@ bool run_aead_decrypt(Vascon_verilator_wrapper* top, const std::string& key, con
 bool run_hash(Vascon_verilator_wrapper* top, size_t msg_len, const std::vector<uint32_t>& expected) {
     reset(top);
 
-    // 1. Set mode
-    top->mode = 1;  // Encrypt
+    top->mode = 1;
     tick(top);
 
-    // 2. Chờ core thoát khỏi IDLE
-    while (top->fsm == 0 /* hoặc enum cho IDLE */) {
+    // Chờ key_ready bật
+    while (!top->key_ready) {
         tick(top);
     }
 
-    // 3. Clear mode
     top->mode = 0;
+
 
     for (size_t i = 0; i < msg_len; i += 4) {
         uint32_t w = ((i+3) << 24) | ((i+2) << 16) | ((i+1) << 8) | i;
