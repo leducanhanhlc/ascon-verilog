@@ -6,6 +6,8 @@
 #include <cassert>
 #include <iomanip>
 
+VerilatedVcdC* tfp = new VerilatedVcdC;
+
 vluint64_t main_time = 0;
 double sc_time_stamp() { return main_time; }
 
@@ -114,7 +116,6 @@ bool run_hash(Vascon_verilator_wrapper* top, size_t msg_len, const std::vector<u
 
 int main(int argc, char** argv) {
     std::cout << "Starting simulation..." << std::endl;
-    VerilatedVcdC* tfp = new VerilatedVcdC;
     top->trace(tfp, 99);  // depth 99 là đủ cho các module nhỏ
     tfp->open("ascon_trace.vcd");   
     Verilated::commandArgs(argc, argv);
