@@ -117,10 +117,11 @@ bool run_hash(Vascon_verilator_wrapper* top, size_t msg_len, const std::vector<u
 
 int main(int argc, char** argv) {
     std::cout << "Starting simulation..." << std::endl;
-    top->trace(tfp, 99);  // depth 99 là đủ cho các module nhỏ
-    tfp->open("ascon_trace.vcd");   
     Verilated::commandArgs(argc, argv);
     auto* top = new Vascon_verilator_wrapper;
+
+    top->trace(tfp, 99);  // depth 99 là đủ cho các module nhỏ
+    tfp->open("ascon_trace.vcd");   
 
     std::vector<std::tuple<std::string, std::string, std::string, std::string, std::string>> aead_kats = {
         {"000102030405060708090A0B0C0D0E0F", "000102030405060708090A0B0C0D0E0F", "",     "",     "4427D64B8E1E1451FC445960F0839BB0"},
