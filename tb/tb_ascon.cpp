@@ -70,8 +70,15 @@ bool run_aead_encrypt(Vascon_verilator_wrapper* top, const std::string& key, con
 
     reset(top);
 
-    send_key(top, k);  // Gửi key trước
-    top->mode = 1; tick(top);  // Sau đó set mode
+    // Set mode trước
+    top->mode = 1; tick(top);
+
+    // Đợi core vào LD_KEY và bật key_ready (hoặc idle_done xong)
+    while (!top->key_ready) tick(top);
+
+    // Bây giờ mới gửi key
+    send_key(top, k);
+
 
     send_bdi(top, npub, 1, true, false);
     send_bdi(top, assoc, 2, true, false);
