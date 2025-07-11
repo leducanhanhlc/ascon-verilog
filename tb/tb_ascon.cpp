@@ -70,8 +70,9 @@ bool run_aead_encrypt(Vascon_verilator_wrapper* top, const std::string& key, con
 
     reset(top);
 
-    top->mode = 1; tick(top);
-    send_key(top, k);
+    send_key(top, k);  // Gửi key trước
+    top->mode = 1; tick(top);  // Sau đó set mode
+
     send_bdi(top, npub, 1, true, false);
     send_bdi(top, assoc, 2, true, false);
     send_bdi(top, plaintext, 3, true, true);
@@ -97,8 +98,9 @@ bool run_aead_decrypt(Vascon_verilator_wrapper* top, const std::string& key, con
 
     reset(top);
 
-    top->mode = 2; tick(top);
-    send_key(top, k);
+    send_key(top, k);  // Gửi key trước
+    top->mode = 2; tick(top);  // Sau đó set mode
+
     send_bdi(top, npub, 1, true, false);
     send_bdi(top, assoc, 2, true, false);
     send_bdi(top, ciphertext, 3, true, true);
