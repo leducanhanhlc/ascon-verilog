@@ -1,0 +1,18 @@
+package:
+  name: obi_ascon
+  authors: ["Leonardo Le <you@example.com>"]
+
+dependencies:
+  ascon_verilog:
+    git: "https://github.com/rprimas/ascon-verilog.git"
+    rev: "3bdee480794f1b91db457da1d1872789317e10d0"
+
+sources:
+  - rtl/obi_ascon_wrapper.sv
+  - rtl/ascon_regs.sv
+  - rtl/ascon_controller.sv
+  - rtl/ascon_core.sv
+  - rtl/asconp.sv
+  - rtl/config.sv
+  - rtl/functions.sv
+
