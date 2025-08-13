@@ -1,25 +1,26 @@
 // obi_ascon.sv
+// OBI slave wrapper for ASCON core with interrupt support (no top-level busy/done/auth)
 // ============================================================================
-
 `include "common_cells/registers.svh"
 
 module obi_ascon #(
+    /// OBI configuration
+    parameter obi_pkg::obi_cfg_t ObiCfg = obi_pkg::ObiDefaultConfig,
+    /// OBI request struct type
+    parameter type obi_req_t = logic,
+    /// OBI response struct type
+    parameter type obi_rsp_t = logic,
     parameter CCW = 64  // Ascon core word size
 )(
-    input  logic        clk,
-    input  logic        rst_n,
+    input  logic clk_i,
+    input  logic rst_ni,
 
-    // 32-bit OBI Interface
-    input  logic [31:0] wdata_i,
-    input  logic [3:0]  addr_i,
-    input  logic        wen_i,
-    input  logic        ren_i,
-    output logic [31:0] rdata_o,
+    // OBI slave interface
+    input  obi_req_t obi_req_i,
+    output obi_rsp_t obi_rsp_o,
 
-    // Optional debug signals
-    output logic        busy_o,
-    output logic        done_o,
-    output logic        auth_o
+    // Interrupt
+    output logic irq_o
 );
 
     // ======================================================
@@ -39,19 +40,22 @@ module obi_ascon #(
     logic         done;
     logic         auth;
 
+    // Interrupt register
+    logic irq_r;
+
     // ======================================================
     // Register block
     // ======================================================
     ascon_regs regs_i (
-        .clk_i(clk),
-        .rst_ni(rst_n),
+        .clk_i(clk_i),
+        .rst_ni(rst_ni),
 
-        // OBI interface
-        .wdata_i(wdata_i),
-        .addr_i(addr_i),
-        .wen_i(wen_i),
-        .ren_i(ren_i),
-        .rdata_o(rdata_o),
+        // 32-bit OBI interface
+        .wdata_i(obi_req_i.a.wdata),
+        .addr_i(obi_req_i.a.addr[3:0]),
+        .wen_i(obi_req_i.a.we),
+        .ren_i(obi_req_i.req & !obi_req_i.a.we),
+        .rdata_o(),
 
         // Controller interface
         .key_o(key),
@@ -72,9 +76,8 @@ module obi_ascon #(
     // Controller
     // ======================================================
     ascon_controller ctrl_i (
-        .clk_i(clk),
-        .rst_ni(rst_n),
-        .holo(rst_n), 
+        .clk_i(clk_i),
+        .rst_ni(rst_ni),
 
         // Control signals from regs
         .key_i(key),
@@ -94,10 +97,33 @@ module obi_ascon #(
     );
 
     // ======================================================
-    // Optional top-level outputs
+    // Interrupt logic
     // ======================================================
-    assign busy_o = busy;
-    assign done_o = done;
-    assign auth_o = auth;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni)
+            irq_r <= 1'b0;
+        else
+            irq_r <= (done | auth);  // set interrupt when done or auth
+    end
+
+    assign irq_o = irq_r;
+
+    // ======================================================
+    // OBI response
+    // ======================================================
+    logic req_q;
+    always_ff @(posedge clk_i or negedge rst_ni) begin
+        if (!rst_ni)
+            req_q <= 1'b0;
+        else
+            req_q <= obi_req_i.req;
+    end
+
+    assign obi_rsp_o.gnt     = obi_req_i.req;
+    assign obi_rsp_o.rvalid  = req_q;
+    assign obi_rsp_o.r.rdata = '0; // ascon_regs handles rdata internally
+    assign obi_rsp_o.r.rid   = obi_req_i.a.aid;
+    assign obi_rsp_o.r.err   = 1'b0;
+    assign obi_rsp_o.r.r_optional = '0;
 
 endmodule
