@@ -1,9 +1,9 @@
 package:
   name: obi_ascon
-  authors: ["Leonardo Le <you@example.com>"]
+  authors: ["Leonardo Le <leducanhanhlc@gmail.com>"]
 
 sources:
-  - rtl/obi_ascon_wrapper.sv
+  - rtl/obi_ascon.sv
   - rtl/ascon_regs.sv
   - rtl/ascon_controller.sv
   - rtl/ascon_core.sv
