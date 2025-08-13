@@ -2,12 +2,12 @@ package:
   name: obi_ascon
   authors: ["Leonardo Le <leducanhanhlc@gmail.com>"]
 
+export_include_dirs:
+  - rtl/include
+
 sources:
   - rtl/obi_ascon.sv
   - rtl/ascon_regs.sv
   - rtl/ascon_controller.sv
   - rtl/ascon_core.sv
-  - rtl/asconp.sv
-  - rtl/config.sv
-  - rtl/functions.sv
 
